@@ -228,6 +228,25 @@ void erase(Tree_t *tree, int data)
   tree->root = erase_tree(tree->root, data, tree->predicate);
 }
 
+static int clear_tree(Node_t *node)
+{
+  if (node == NULL)
+    return 1;
+  int left = clear_tree(node->left);
+  if (!left)
+    free(node->left);
+  int right = clear_tree(node->right);
+  if (!right)
+    free(node->right);
+  return left ^ right;
+}
+void clear(Tree_t *tree)
+{
+  if (!clear_tree(tree->root))
+    free(tree->root);
+  tree->root = NULL;
+}
+
 /* try to make it variable args */
 void init_set(Tree_t *tree, int (*predicate)())
 {
@@ -397,9 +416,14 @@ int main()
 
   Iterator_t *res = find(tree, 7);
   if (res->ptr == NULL) {
-    printf("\n not found!!");
+    printf("\n not found!!\n");
   }
   else {
     printf("res : %d\n", get_data(res));
   }
+
+  printf("Clearing set...\n");
+  clear(tree);
+  insert(tree, 7);
+  disp(tree);
 }
