@@ -370,7 +370,13 @@ Iterator_t *find(Tree_t *tree, int data)
 
 Iterator_t *next(Node_t *node)
 {
-  /* TODO */
+  Node_t* temp = NULL;
+  if(node && node->right)
+  {
+    temp = inorder_successor(node);
+    return create_iterator(temp);
+  }
+  return create_iterator(temp);
 }
 
 int main()
@@ -386,6 +392,12 @@ int main()
   insert(tree, 2);
   insert(tree, 4);
   printf("Size : %d\n", size(tree));
+  Iterator_t* next_node = next(tree->root->right);
+  if(next_node->ptr)
+  {
+    int next_val = next_node->ptr->data;
+    printf("Next : %d\n", next_val);
+  }
 
   erase(tree, 2);
   erase(tree, 4);
