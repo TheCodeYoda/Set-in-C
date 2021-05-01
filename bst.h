@@ -14,6 +14,7 @@ typedef struct BST {
 
 typedef struct Iterator {
   Node_t *ptr;
+  Node_t *root;
 } Iterator_t;
 
 /* Node interface */
@@ -37,6 +38,8 @@ void init_iterator(Iterator_t *iter, Tree_t *tree);
 Iterator_t *find(Tree_t *tree, int data);
 Iterator_t *begin(Tree_t *tree);
 Iterator_t *end(Tree_t *tree);
-Iterator_t *next(Iterator_t *iter, Tree_t *tree);
+Iterator_t *next(Iterator_t *iter);
 int has_next(Iterator_t *iter);
+Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data);
+Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data);
 #endif

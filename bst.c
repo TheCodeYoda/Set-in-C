@@ -333,13 +333,16 @@ int my_predicate(int a, int b)
 
 void init_iterator(Iterator_t *iter, Tree_t *tree)
 {
-  iter->ptr = tree->root;
+
+  iter->ptr = NULL;
+  iter->root = tree->root;
 }
 
-static Iterator_t *create_iterator(Node_t *node)
+static Iterator_t *create_iterator(Node_t *node, Node_t *root)
 {
   Iterator_t *temp = malloc(sizeof(Iterator_t));
   temp->ptr = node;
+  temp->root = root;
   return temp;
 }
 
@@ -356,7 +359,7 @@ Iterator_t *begin(Tree_t *tree)
   while (start->left != NULL) {
     start = start->left;
   }
-  Iterator_t *iter = create_iterator(start);
+  Iterator_t *iter = create_iterator(start, tree->root);
   return iter;
 }
 
@@ -366,14 +369,14 @@ Iterator_t *end(Tree_t *tree)
   while (start->right != NULL) {
     start = start->right;
   }
-  Iterator_t *iter = create_iterator(start);
+  Iterator_t *iter = create_iterator(start, tree->root);
   return iter;
 }
 
 static Iterator_t *find_tree(Node_t *node, int data)
 {
   if (node == NULL) {
-    return create_iterator(NULL);
+    return create_iterator(NULL, NULL);
   }
   if (data < node->data) {
     return find_tree(node->left, data);
@@ -382,16 +385,18 @@ static Iterator_t *find_tree(Node_t *node, int data)
     return find_tree(node->right, data);
   }
   else {
-    return create_iterator(node);
+    return create_iterator(node, NULL);
   }
 }
 
 Iterator_t *find(Tree_t *tree, int data)
 {
-  return find_tree(tree->root, data);
+  Iterator_t *it = find_tree(tree->root, data);
+  it->root = tree->root;
+  return it;
 }
 
-Iterator_t *next(Iterator_t *it, Tree_t *tree)
+Iterator_t *next(Iterator_t *it)
 {
   /* Node_t *temp = NULL; */
   /* if (node && node->right) { */
@@ -403,7 +408,7 @@ Iterator_t *next(Iterator_t *it, Tree_t *tree)
     it->ptr = inorder_successor(it->ptr);
   }
   else {
-    it->ptr = inorder_successor_par(it->ptr, tree->root);
+    it->ptr = inorder_successor_par(it->ptr, it->root);
   }
 }
 
@@ -413,6 +418,28 @@ int has_next(Iterator_t *it)
     return 0;
   }
   return 1;
+}
+
+Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data)
+{
+  while (has_next(begin)) {
+    if (get_data(begin) >= data) {
+      return begin;
+    }
+    next(begin);
+  }
+  return begin;
+}
+
+Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data)
+{
+  while (has_next(begin)) {
+    if (get_data(begin) > data) {
+      return begin;
+    }
+    next(begin);
+  }
+  return begin;
 }
 
 int main()
@@ -432,8 +459,13 @@ int main()
   Iterator_t *it = begin(tree);
   while (has_next(it)) {
     printf("Next : %d\n", get_data(it));
-    next(it, tree);
+    next(it);
   }
+
+  Iterator_t *it1 = upper_bound(begin(tree), end(tree), 5);
+  printf("\nUpper bound of 5 : %d\n", get_data(it1));
+  Iterator_t *it2 = lower_bound(begin(tree), end(tree), 5);
+  printf("\nLower bound of 5 : %d\n", get_data(it2));
 
   /* erase(tree, 2); */
   /* erase(tree, 4); */
@@ -446,12 +478,7 @@ int main()
   /* insert(tree, 4); */
 
   /* printf("Size : %d\n", size(tree)); */
-  /* /\* printf("%d\n", tree->root->data); *\/ */
-  /* /\* printf("%d\n", tree->root->left->data); *\/ */
-  /* /\* printf("%d\n", tree->root->right->data); *\/ */
-  /* /\* printf("%d\n", tree->root->left->left->data); *\/ */
-  /* /\* printf("%d\n", tree->root->left->right->data); *\/ */
-  /* /\* printf("%d\n", tree->root->left->right->right->data); *\/ */
+
   /* disp(tree); */
 
   /* Iterator_t *it_start; */
