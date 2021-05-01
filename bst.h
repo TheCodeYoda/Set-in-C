@@ -37,5 +37,6 @@ void init_iterator(Iterator_t *iter, Tree_t *tree);
 Iterator_t *find(Tree_t *tree, int data);
 Iterator_t *begin(Tree_t *tree);
 Iterator_t *end(Tree_t *tree);
-Iterator_t *next(Node_t *node);
+Iterator_t *next(Iterator_t *iter, Tree_t *tree);
+int has_next(Iterator_t *iter);
 #endif
