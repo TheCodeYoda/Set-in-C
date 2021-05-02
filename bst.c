@@ -273,10 +273,12 @@ void clear(Tree_t *tree)
 }
 
 /* try to make it variable args */
-void init_set(Tree_t *tree, int (*predicate)(int, int))
+Tree_t *init_set(int (*predicate)(int, int), char type[])
 {
-  tree->root = NULL;
-  tree->predicate = predicate;
+  Tree_t *temp = malloc(sizeof(Tree_t));
+  temp->root = NULL;
+  temp->predicate = predicate;
+  return temp;
 }
 
 void inorder(Node_t *node)
@@ -394,9 +396,12 @@ static Iterator_t *find_tree(Node_t *node, int data, int (*predicate)(int, int))
 
 Iterator_t *find(Tree_t *tree, int data)
 {
-  Iterator_t *it = find_tree(tree->root, data, tree->predicate);
-  it->root = tree->root;
-  return it;
+  /* while (begin->predicate(get_data(begin), get_data(end)) != -1 && */
+  /*        begin->predicate(get_data(begin), data) != -1) { */
+  /*   next(begin); */
+  /* } */
+  /* return begin; */
+  return find_tree(tree->root, data, tree->predicate);
 }
 
 Iterator_t *next(Iterator_t *it)
@@ -448,8 +453,7 @@ Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data)
 
 int main()
 {
-  Tree_t *tree = malloc(sizeof(Tree_t));
-  init_set(tree, default_predicate);
+  Tree_t *tree = init_set(default_predicate, "int");
   insert(tree, 1);
   insert(tree, 3);
   insert(tree, 5);
@@ -506,8 +510,7 @@ int main()
   /* insert(tree, 7); */
   /* disp(tree); */
 
-  Tree_t *set1 = malloc(sizeof(Tree_t));
-  init_set(set1, my_predicate);
+  Tree_t *set1 = init_set(my_predicate, "int");
   insert(set1, 3);
   insert(set1, 5);
   insert(set1, 9);
@@ -520,5 +523,13 @@ int main()
   while (has_next(it)) {
     printf("Next : %d\n", get_data(it));
     next(it);
+  }
+
+  Iterator_t *res = find(set1, 7);
+  if (res->ptr == NULL) {
+    printf("\n not found!!\n");
+  }
+  else {
+    printf("res : %d\n", get_data(res));
   }
 }

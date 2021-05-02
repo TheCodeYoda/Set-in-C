@@ -27,7 +27,7 @@ void balance(Node_t *root);
 /* necessory?? supporting iterators?? */
 
 /* tree(set) interface */
-void init_set(Tree_t *tree, int (*predicate)());
+Tree_t *init_set(int (*predicate)(int, int), char type[]); /* change this */
 void disp(Tree_t *tree);
 void insert(Tree_t *tree, int data);
 void erase(Tree_t *tree, int data);

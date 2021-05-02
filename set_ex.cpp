@@ -13,7 +13,7 @@ struct cmp {
 
 int main()
 {
-  set<int> s;
+  set<int, cmp> s;
   s.insert(1);
   s.insert(3);
   s.insert(5);
