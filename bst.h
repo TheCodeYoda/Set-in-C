@@ -15,6 +15,7 @@ typedef struct BST {
 typedef struct Iterator {
   Node_t *ptr;
   Node_t *root;
+  int (*predicate)(int, int);
 } Iterator_t;
 
 /* Node interface */

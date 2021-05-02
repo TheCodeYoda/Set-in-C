@@ -8,27 +8,29 @@ int max(int a, int b)
   return (a > b) ? a : b;
 }
 
-Node_t *find_ancestor(Node_t *anc, Node_t *root, int data)
+Node_t *find_ancestor(Node_t *anc, Node_t *root, int data, int (*predicate)(int, int))
 {
   if (root == NULL) {
     return NULL;
   }
-  if (root->data <= data) {
+  /* root->data <= data */
+  if (predicate(root->data, data) == 1 || predicate(root->data, data) == -1) {
     if (anc && anc->left == root) {
       return anc;
     }
     else {
-      return find_ancestor(root, root->right, data);
+      return find_ancestor(root, root->right, data, predicate);
     }
   }
-  if (data < root->data) {
-    return find_ancestor(root, root->left, data);
+  /* data < root->data */
+  if (predicate(data, root->data)) {
+    return find_ancestor(root, root->left, data, predicate);
   }
 }
 
-Node_t *inorder_successor_par(Node_t *node, Node_t *root)
+Node_t *inorder_successor_par(Node_t *node, Node_t *root, int (*predicate)(int, int))
 {
-  return find_ancestor(NULL, root, node->data);
+  return find_ancestor(NULL, root, node->data, predicate);
 }
 
 Node_t *inorder_successor(Node_t *node)
@@ -271,7 +273,7 @@ void clear(Tree_t *tree)
 }
 
 /* try to make it variable args */
-void init_set(Tree_t *tree, int (*predicate)())
+void init_set(Tree_t *tree, int (*predicate)(int, int))
 {
   tree->root = NULL;
   tree->predicate = predicate;
@@ -338,11 +340,12 @@ void init_iterator(Iterator_t *iter, Tree_t *tree)
   iter->root = tree->root;
 }
 
-static Iterator_t *create_iterator(Node_t *node, Node_t *root)
+static Iterator_t *create_iterator(Node_t *node, Node_t *root, int (*predicate)(int, int))
 {
   Iterator_t *temp = malloc(sizeof(Iterator_t));
   temp->ptr = node;
   temp->root = root;
+  temp->predicate = predicate;
   return temp;
 }
 
@@ -359,7 +362,7 @@ Iterator_t *begin(Tree_t *tree)
   while (start->left != NULL) {
     start = start->left;
   }
-  Iterator_t *iter = create_iterator(start, tree->root);
+  Iterator_t *iter = create_iterator(start, tree->root, tree->predicate);
   return iter;
 }
 
@@ -369,29 +372,29 @@ Iterator_t *end(Tree_t *tree)
   while (start->right != NULL) {
     start = start->right;
   }
-  Iterator_t *iter = create_iterator(start, tree->root);
+  Iterator_t *iter = create_iterator(start, tree->root, tree->predicate);
   return iter;
 }
 
-static Iterator_t *find_tree(Node_t *node, int data)
+static Iterator_t *find_tree(Node_t *node, int data, int (*predicate)(int, int))
 {
   if (node == NULL) {
-    return create_iterator(NULL, NULL);
+    return create_iterator(NULL, NULL, predicate);
   }
-  if (data < node->data) {
-    return find_tree(node->left, data);
+  if (predicate(data, node->data) == 1) {
+    return find_tree(node->left, data, predicate);
   }
-  else if (data > node->data) {
-    return find_tree(node->right, data);
+  else if (predicate(data, node->data) == 0) {
+    return find_tree(node->right, data, predicate);
   }
   else {
-    return create_iterator(node, NULL);
+    return create_iterator(node, NULL, predicate);
   }
 }
 
 Iterator_t *find(Tree_t *tree, int data)
 {
-  Iterator_t *it = find_tree(tree->root, data);
+  Iterator_t *it = find_tree(tree->root, data, tree->predicate);
   it->root = tree->root;
   return it;
 }
@@ -408,7 +411,7 @@ Iterator_t *next(Iterator_t *it)
     it->ptr = inorder_successor(it->ptr);
   }
   else {
-    it->ptr = inorder_successor_par(it->ptr, it->root);
+    it->ptr = inorder_successor_par(it->ptr, it->root, it->predicate);
   }
 }
 
@@ -423,7 +426,8 @@ int has_next(Iterator_t *it)
 Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data)
 {
   while (has_next(begin)) {
-    if (get_data(begin) >= data) {
+    if (begin->predicate(get_data(begin), data) == 0 ||
+        begin->predicate(get_data(begin), data) == -1) {
       return begin;
     }
     next(begin);
@@ -434,7 +438,7 @@ Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data)
 Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data)
 {
   while (has_next(begin)) {
-    if (get_data(begin) > data) {
+    if (begin->predicate(get_data(begin), data) == 0) {
       return begin;
     }
     next(begin);
@@ -501,4 +505,20 @@ int main()
   /* clear(tree); */
   /* insert(tree, 7); */
   /* disp(tree); */
+
+  Tree_t *set1 = malloc(sizeof(Tree_t));
+  init_set(set1, my_predicate);
+  insert(set1, 3);
+  insert(set1, 5);
+  insert(set1, 9);
+  insert(set1, 12);
+  insert(set1, 13);
+  insert(set1, 15);
+  disp(set1);
+
+  it = begin(set1);
+  while (has_next(it)) {
+    printf("Next : %d\n", get_data(it));
+    next(it);
+  }
 }
