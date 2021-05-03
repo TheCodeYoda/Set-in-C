@@ -1,14 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "bst.h"
+
+/* Node interface */
+static Node_t *create_node(void *data, int size_of_type);
+static Node_t *insert_tree(Node_t *root, void *data, int (*predicate)(), int size_of_type);
+static Node_t *erase_tree(Node_t *root, void *data, int (*predicate)());
+static void inorder(Node_t *root, void (*printer)());
 
 int max(int a, int b)
 {
   return (a > b) ? a : b;
 }
 
-Node_t *find_ancestor(Node_t *anc, Node_t *root, int data, int (*predicate)(int, int))
+Node_t *find_ancestor(Node_t *anc, Node_t *root, void *data, int (*predicate)())
 {
   if (root == NULL) {
     return NULL;
@@ -28,7 +35,7 @@ Node_t *find_ancestor(Node_t *anc, Node_t *root, int data, int (*predicate)(int,
   }
 }
 
-Node_t *inorder_successor_par(Node_t *node, Node_t *root, int (*predicate)(int, int))
+Node_t *inorder_successor_par(Node_t *node, Node_t *root, int (*predicate)())
 {
   return find_ancestor(NULL, root, node->data, predicate);
 }
@@ -43,10 +50,11 @@ Node_t *inorder_successor(Node_t *node)
   return temp;
 }
 
-Node_t *create_node(int data)
+static Node_t *create_node(void *data, int size_of_type)
 {
   Node_t *node = malloc(sizeof(Node_t));
-  node->data = data;
+  node->data = malloc(size_of_type);
+  memcpy(node->data, data, size_of_type);
   node->left = NULL;
   node->right = NULL;
   node->ht = 1;
@@ -115,16 +123,16 @@ static Node_t *leftRotate(Node_t *x)
   return y;
 }
 
-Node_t *insert_tree(Node_t *root, int data, int (*predicate)(int, int))
+static Node_t *insert_tree(Node_t *root, void *data, int (*predicate)(), int size_of_type)
 {
   if (root == NULL) {
-    return create_node(data);
+    return create_node(data, size_of_type);
   }
   if (predicate(data, root->data) == 1) {
-    root->left = insert_tree(root->left, data, predicate);
+    root->left = insert_tree(root->left, data, predicate, size_of_type);
   }
   else if (predicate(data, root->data) == 0) {
-    root->right = insert_tree(root->right, data, predicate);
+    root->right = insert_tree(root->right, data, predicate, size_of_type);
   }
 
   else {
@@ -162,17 +170,12 @@ Node_t *insert_tree(Node_t *root, int data, int (*predicate)(int, int))
   return root;
 }
 
-void insert(Tree_t *tree, int data)
+void insert(Tree_t *tree, void *data)
 {
-  if (tree->root == NULL) {
-    tree->root = insert_tree(tree->root, data, tree->predicate);
-  }
-  else {
-    tree->root = insert_tree(tree->root, data, tree->predicate);
-  }
+  tree->root = insert_tree(tree->root, data, tree->predicate, tree->size_of_type);
 }
 
-Node_t *erase_tree(Node_t *root, int data, int (*predicate)(int, int))
+static Node_t *erase_tree(Node_t *root, void *data, int (*predicate)())
 {
   if (root == NULL) {
     return NULL;
@@ -248,7 +251,7 @@ Node_t *erase_tree(Node_t *root, int data, int (*predicate)(int, int))
   return root;
 }
 
-void erase(Tree_t *tree, int data)
+void erase(Tree_t *tree, void *data)
 {
   tree->root = erase_tree(tree->root, data, tree->predicate);
 }
@@ -273,26 +276,27 @@ void clear(Tree_t *tree)
 }
 
 /* try to make it variable args */
-Tree_t *init_set(int (*predicate)(int, int), char type[])
+Tree_t *init_set(int (*predicate)(), int size_of_type)
 {
   Tree_t *temp = malloc(sizeof(Tree_t));
   temp->root = NULL;
   temp->predicate = predicate;
+  temp->size_of_type = size_of_type;
   return temp;
 }
 
-void inorder(Node_t *node)
+static void inorder(Node_t *node, void (*printer)())
 {
   if (node == NULL)
     return;
-  inorder(node->left);
-  printf("%d %d %d\n", node->data, node->ht, get_balance_factor(node));
-  inorder(node->right);
+  inorder(node->left, printer);
+  printer(node->data);
+  inorder(node->right, printer);
 }
 
-void disp(Tree_t *tree)
+void disp(Tree_t *tree, void (*printer)())
 {
-  inorder(tree->root);
+  inorder(tree->root, printer);
 }
 
 static void tree_size(Node_t *node, int *num)
@@ -311,28 +315,6 @@ int size(Tree_t *tree)
   return num;
 }
 
-int default_predicate(int a, int b)
-{
-  if (a < b) {
-    return 1;
-  }
-  else if (a > b) {
-    return 0;
-  }
-  return -1;
-}
-
-int my_predicate(int a, int b)
-{
-  if ((a % 3) < (b % 3)) {
-    return 1;
-  }
-  else if ((a % 3) > (b % 3)) {
-    return 0;
-  }
-  return -1;
-}
-
 /* Iterator interface */
 
 void init_iterator(Iterator_t *iter, Tree_t *tree)
@@ -342,7 +324,7 @@ void init_iterator(Iterator_t *iter, Tree_t *tree)
   iter->root = tree->root;
 }
 
-static Iterator_t *create_iterator(Node_t *node, Node_t *root, int (*predicate)(int, int))
+static Iterator_t *create_iterator(Node_t *node, Node_t *root, int (*predicate)())
 {
   Iterator_t *temp = malloc(sizeof(Iterator_t));
   temp->ptr = node;
@@ -378,30 +360,47 @@ Iterator_t *end(Tree_t *tree)
   return iter;
 }
 
-static Iterator_t *find_tree(Node_t *node, int data, int (*predicate)(int, int))
+/* static Iterator_t *find_tree(Node_t *node, void *data, int (*comparator)(), int (*predicate)())
+ */
+/* { */
+/*   if (node == NULL) { */
+/*     return create_iterator(NULL, NULL, predicate); */
+/*   } */
+/*   if (predicate(data, node->data) == 1) { */
+/*     return find_tree(node->left, data, predicate); */
+/*   } */
+/*   else if (predicate(data, node->data) == 0) { */
+/*     return find_tree(node->right, data, predicate); */
+/*   } */
+/*   else { */
+/*     return create_iterator(node, NULL, predicate); */
+/*   } */
+/* } */
+
+static Iterator_t *find_tree(Node_t *node, void *data, int (*comparator)(), int (*predicate)())
 {
   if (node == NULL) {
     return create_iterator(NULL, NULL, predicate);
   }
-  if (predicate(data, node->data) == 1) {
-    return find_tree(node->left, data, predicate);
-  }
-  else if (predicate(data, node->data) == 0) {
-    return find_tree(node->right, data, predicate);
-  }
-  else {
+  if (comparator(data, node->data) == -1) {
     return create_iterator(node, NULL, predicate);
   }
+  Iterator_t *left = find_tree(node->left, data, comparator, predicate);
+  Iterator_t *right = find_tree(node->left, data, comparator, predicate);
+  if (left->ptr) {
+    return left;
+  }
+  return right;
 }
 
-Iterator_t *find(Tree_t *tree, int data)
+Iterator_t *find(Tree_t *tree, void *data, int (*comparator)())
 {
   /* while (begin->predicate(get_data(begin), get_data(end)) != -1 && */
   /*        begin->predicate(get_data(begin), data) != -1) { */
   /*   next(begin); */
   /* } */
   /* return begin; */
-  return find_tree(tree->root, data, tree->predicate);
+  return find_tree(tree->root, data, comparator, tree->predicate);
 }
 
 Iterator_t *next(Iterator_t *it)
@@ -428,7 +427,7 @@ int has_next(Iterator_t *it)
   return 1;
 }
 
-Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data)
+Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data)
 {
   while (has_next(begin)) {
     if (begin->predicate(get_data(begin), data) == 0 ||
@@ -440,7 +439,7 @@ Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, int data)
   return begin;
 }
 
-Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data)
+Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data)
 {
   while (has_next(begin)) {
     if (begin->predicate(get_data(begin), data) == 0) {
@@ -451,29 +450,106 @@ Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, int data)
   return begin;
 }
 
+int predicate_int(const void *x, const void *y)
+{
+
+  int a = *(int *)x;
+  int b = *(int *)y;
+  if (a < b) {
+    return 1;
+  }
+  else if (a > b) {
+    return 0;
+  }
+  return -1;
+}
+
+int predicate_double(const void *x, const void *y)
+{
+
+  double a = *(double *)x;
+  double b = *(double *)y;
+  if (a - b < 0) {
+    return 1;
+  }
+  else if (a - b > 0) {
+    return 0;
+  }
+  return -1;
+}
+
+int my_predicate(const void *x, const void *y)
+{
+  int a = *(int *)x;
+  int b = *(int *)y;
+
+  if ((a % 3) < (b % 3)) {
+    return 1;
+  }
+  else if ((a % 3) > (b % 3)) {
+    return 0;
+  }
+  return -1;
+}
+
+int comparator_int(const void *x, const void *y)
+{
+  int a = *(int *)x;
+  int b = *(int *)y;
+  if (a < b) {
+    return 1;
+  }
+  else if (a > b) {
+    return 0;
+  }
+  return -1;
+}
+
+int comparator_double(const void *x, const void *y)
+{
+  double a = *(double *)x;
+  double b = *(double *)y;
+  if (a - b < 0) {
+    return 1;
+  }
+  else if (a - b > 0) {
+    return 0;
+  }
+  return -1;
+}
+
+void printer(void *x)
+{
+  printf("%lf\n", *(double *)x);
+}
+
 int main()
 {
-  Tree_t *tree = init_set(default_predicate, "int");
-  insert(tree, 1);
-  insert(tree, 3);
-  insert(tree, 5);
-  insert(tree, 7);
-  insert(tree, 1);
-  insert(tree, 2);
-  insert(tree, 2);
-  insert(tree, 4);
-  disp(tree);
-  printf("Size : %d\n", size(tree));
-  Iterator_t *it = begin(tree);
-  while (has_next(it)) {
-    printf("Next : %d\n", get_data(it));
-    next(it);
+  Tree_t *tree = init_set(predicate_double, sizeof(double));
+  double a[6] = {1.0, 1.5, 3.5, 2.7, 1.9, 7.9};
+  for (int i = 1; i < 6; i++) {
+    insert(tree, &a[i]);
   }
+  disp(tree, printer);
+  double key = 2.7;
+  Iterator_t *it = find(tree, &key, comparator_double);
+  if (it->ptr) {
+    printer(it->ptr->data);
+  }
+  else {
+    printf("Not found....\n");
+  }
+  /* printf("Size : %d\n", size(tree)); */
+  /* Iterator_t *it = begin(tree); */
+  /* while (has_next(it)) { */
+  /*   printf("Next : %d\n", get_data(it)); */
+  /*   next(it); */
+  /* } */
 
-  Iterator_t *it1 = upper_bound(begin(tree), end(tree), 5);
-  printf("\nUpper bound of 5 : %d\n", get_data(it1));
-  Iterator_t *it2 = lower_bound(begin(tree), end(tree), 5);
-  printf("\nLower bound of 5 : %d\n", get_data(it2));
+  /* Iterator_t *it1 = upper_bound(begin(tree), end(tree), 5); */
+  /* printf("\nUpper bound of 5 : %d\n", get_data(it1)); */
+  /* Iterator_t *it2 = lower_bound(begin(tree), end(tree), 5); */
+  /* printf("\nLower bound of 5 : %d\n", get_data(it2)); */
 
   /* erase(tree, 2); */
   /* erase(tree, 4); */
@@ -510,26 +586,26 @@ int main()
   /* insert(tree, 7); */
   /* disp(tree); */
 
-  Tree_t *set1 = init_set(my_predicate, "int");
-  insert(set1, 3);
-  insert(set1, 5);
-  insert(set1, 9);
-  insert(set1, 12);
-  insert(set1, 13);
-  insert(set1, 15);
-  disp(set1);
+  /* Tree_t *set1 = init_set(my_predicate, "int"); */
+  /* insert(set1, 3); */
+  /* insert(set1, 5); */
+  /* insert(set1, 9); */
+  /* insert(set1, 12); */
+  /* insert(set1, 13); */
+  /* insert(set1, 15); */
+  /* disp(set1); */
 
-  it = begin(set1);
-  while (has_next(it)) {
-    printf("Next : %d\n", get_data(it));
-    next(it);
-  }
+  /* it = begin(set1); */
+  /* while (has_next(it)) { */
+  /*   printf("Next : %d\n", get_data(it)); */
+  /*   next(it); */
+  /* } */
 
-  Iterator_t *res = find(set1, 7);
-  if (res->ptr == NULL) {
-    printf("\n not found!!\n");
-  }
-  else {
-    printf("res : %d\n", get_data(res));
-  }
+  /* Iterator_t *res = find(set1, 7); */
+  /* if (res->ptr == NULL) { */
+  /*   printf("\n not found!!\n"); */
+  /* } */
+  /* else { */
+  /*   printf("res : %d\n", get_data(res)); */
+  /* } */
 }
