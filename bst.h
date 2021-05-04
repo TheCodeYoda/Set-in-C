@@ -42,8 +42,9 @@ Iterator_t *begin(Tree_t *tree);
 Iterator_t *end(Tree_t *tree);
 Iterator_t *next(Iterator_t *iter);
 int has_next(Iterator_t *iter);
-Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data);
-Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data);
+Iterator_t *lower_bound(Iterator_t *begin, void *data, int (*comparator)());
+Iterator_t *upper_bound(Iterator_t *begin, void *data, int (*comparator)());
+void *get_data(Iterator_t *it);
 #endif
 
 /* after making things generic user should provide 3 things */
