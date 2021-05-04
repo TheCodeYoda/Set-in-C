@@ -19,14 +19,6 @@ typedef struct Iterator {
   int (*predicate)();
 } Iterator_t;
 
-/* Node interface */
-/* Node_t *create_node(void *data, int size_of_type); */
-/* Node_t *insert_tree(Node_t *root, void *data, int (*predicate)(), int size_of_type); */
-/* Node_t *erase_tree(Node_t *root, void *data, int (*predicate)()); */
-/* void inorder(Node_t *root, void (*printer)()); */
-/* void balance(Node_t *root); */
-/* necessory?? supporting iterators?? */
-
 /* tree(set) interface */
 Tree_t *init_set(int (*predicate)(), int size_of_type); /* change this */
 void disp(Tree_t *tree, void (*printer)());
@@ -34,6 +26,7 @@ void insert(Tree_t *tree, void *data);
 void erase(Tree_t *tree, void *data);
 void clear(Tree_t *tree);
 int size(Tree_t *tree);
+void merge(Tree_t *set1, Tree_t *set2);
 
 /* Iterator interface */
 void init_iterator(Iterator_t *iter, Tree_t *tree);
@@ -42,8 +35,8 @@ Iterator_t *begin(Tree_t *tree);
 Iterator_t *end(Tree_t *tree);
 Iterator_t *next(Iterator_t *iter);
 int has_next(Iterator_t *iter);
-Iterator_t *lower_bound(Iterator_t *begin, void *data, int (*comparator)());
-Iterator_t *upper_bound(Iterator_t *begin, void *data, int (*comparator)());
+Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)());
+Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)());
 void *get_data(Iterator_t *it);
 #endif
 

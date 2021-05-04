@@ -408,9 +408,9 @@ int has_next(Iterator_t *it)
   return 1;
 }
 
-Iterator_t *lower_bound(Iterator_t *begin, void *data, int (*comparator)())
+Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin)) {
+  while (has_next(begin) && comparator(get_data(begin), get_data(end)) != -1) {
     if (comparator(get_data(begin), data) == 0 || comparator(get_data(begin), data) == -1) {
       return begin;
     }
@@ -419,13 +419,27 @@ Iterator_t *lower_bound(Iterator_t *begin, void *data, int (*comparator)())
   return begin;
 }
 
-Iterator_t *upper_bound(Iterator_t *begin, void *data, int (*comparator)())
+Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin)) {
+  while (has_next(begin) && comparator(get_data(begin), get_data(end)) != -1) {
     if (comparator(get_data(begin), data) == 0) {
       return begin;
     }
     next(begin);
   }
   return begin;
+}
+
+void merge_tree(Tree_t *set1, Tree_t *set2, Node_t *node)
+{
+  if (!node) {
+    return;
+  }
+  merge_tree(set1, set2, node->left);
+  insert(set1, node->data);
+  merge_tree(set1, set2, node->right);
+}
+void merge(Tree_t *set1, Tree_t *set2)
+{
+  merge_tree(set1, set2, set2->root);
 }

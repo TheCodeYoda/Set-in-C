@@ -88,7 +88,7 @@ int main()
     insert(tree, &a[i]);
   }
   disp(tree, printer_double);
-  double key = 2.7;
+  double key = 3.5;
   Iterator_t *it = find(tree, &key, comparator_double);
   if (has_next(it)) {
     printf("\nfound!! elem ");
@@ -97,6 +97,17 @@ int main()
   else {
     printf("Not found....\n");
   }
+
+  /* key = 2.7; */
+  /* Iterator_t *it1 = upper_bound(begin(tree), it, &key, comparator_double); */
+  /* if (has_next(it1)) { */
+  /*   printf("\nlower bound found!! elem "); */
+  /*   printer_double(get_data(it1)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
+
   printf("Size : %d\n", size(tree));
   erase(tree, &key);
   clear(tree);
@@ -123,19 +134,19 @@ int main()
   else {
     printf("Not found....\n");
   }
-  printf("Size : %d\n", size(set1));
-  erase(set1, &key);
-  clear(set1);
-  printf("Size : %d\n", size(set1));
-  it = begin(set1);
-  while (has_next(it)) {
-    printf("Next : ");
-    printer_int(get_data(it));
-    next(it);
-  }
+  /* printf("Size : %d\n", size(set1)); */
+  /* erase(set1, &key); */
+  /* clear(set1); */
+  /* printf("Size : %d\n", size(set1)); */
+  /* it = begin(set1); */
+  /* while (has_next(it)) { */
+  /*   printf("Next : "); */
+  /*   printer_int(get_data(it)); */
+  /*   next(it); */
+  /* } */
 
   Tree_t *set2 = init_set(my_predicate, sizeof(int));
-  int c[9] = {9, 3, 15, 13, 16, 19, 5, 8, 11};
+  int c[9] = {9, 3, 15, 13, 16, 19};
   for (int i = 0; i < 9; i++) {
     insert(set2, &c[i]);
   }
@@ -160,16 +171,26 @@ int main()
     printf("Not found....\n");
   }
 
-  printf("Size : %d\n", size(set2));
-  erase(set2, &key);
-  clear(set2);
-  printf("Size : %d\n", size(set2));
-  it = begin(set2);
-  while (has_next(it)) {
-    printf("Next : ");
-    printer_int(get_data(it));
-    next(it);
-  }
+  /* printf("Size : %d\n", size(set2)); */
+  /* erase(set2, &key); */
+  /* clear(set2); */
+  /* printf("Size : %d\n", size(set2)); */
+  /* it = begin(set2); */
+  /* while (has_next(it)) { */
+  /*   printf("Next : "); */
+  /*   printer_int(get_data(it)); */
+  /*   next(it); */
+  /* } */
+
+  printf("before merge: \n\n");
+  disp(set1, printer_int);
+  printf("\n");
+  disp(set2, printer_int);
+  printf("\n\nafter merge:\n\n");
+  merge(set2, set1);
+  disp(set1, printer_int);
+  printf("\n");
+  disp(set2, printer_int);
 
   /* Iterator_t *it1 = upper_bound(begin(tree), end(tree), 5); */
   /* printf("\nUpper bound of 5 : %d\n", get_data(it1)); */
