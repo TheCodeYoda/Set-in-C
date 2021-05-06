@@ -170,7 +170,7 @@ static Node_t *insert_tree(Node_t *root, void *data, int (*predicate)(), int siz
   return root;
 }
 
-void insert(Tree_t *tree, void *data)
+void insert(Set *tree, void *data)
 {
   tree->root = insert_tree(tree->root, data, tree->predicate, tree->size_of_type);
 }
@@ -251,7 +251,7 @@ static Node_t *erase_tree(Node_t *root, void *data, int (*predicate)())
   return root;
 }
 
-void erase(Tree_t *tree, void *data)
+void erase(Set *tree, void *data)
 {
   tree->root = erase_tree(tree->root, data, tree->predicate);
 }
@@ -268,7 +268,7 @@ static int clear_tree(Node_t *node)
     free(node->right);
   return left ^ right;
 }
-void clear(Tree_t *tree)
+void clear(Set *tree)
 {
   if (!clear_tree(tree->root))
     free(tree->root);
@@ -276,9 +276,9 @@ void clear(Tree_t *tree)
 }
 
 /* try to make it variable args */
-Tree_t *init_set(int (*predicate)(), int size_of_type)
+Set *init_set(int (*predicate)(), int size_of_type)
 {
-  Tree_t *temp = malloc(sizeof(Tree_t));
+  Set *temp = malloc(sizeof(Set));
   temp->root = NULL;
   temp->predicate = predicate;
   temp->size_of_type = size_of_type;
@@ -294,9 +294,13 @@ static void inorder(Node_t *node, void (*printer)())
   inorder(node->right, printer);
 }
 
-void disp(Tree_t *tree, void (*printer)())
+void disp(Iterator_t *begin, Iterator_t *end, void (*printer)())
 {
-  inorder(tree->root, printer);
+  /* inorder(tree->root, printer); */
+  while (has_next(begin) && begin->ptr != end->ptr) {
+    printer(get_data(begin));
+    next(begin);
+  }
 }
 
 static void tree_size(Node_t *node, int *num)
@@ -308,7 +312,7 @@ static void tree_size(Node_t *node, int *num)
   tree_size(node->right, num);
 }
 
-int size(Tree_t *tree)
+int size(Set *tree)
 {
   int num = 0;
   tree_size(tree->root, &num);
@@ -317,11 +321,12 @@ int size(Tree_t *tree)
 
 /* Iterator interface */
 
-void init_iterator(Iterator_t *iter, Tree_t *tree)
+void init_iterator(Iterator_t *iter, Set *tree)
 {
 
   iter->ptr = NULL;
   iter->root = tree->root;
+  iter->predicate = tree->predicate;
 }
 
 static Iterator_t *create_iterator(Node_t *node, Node_t *root, int (*predicate)())
@@ -340,7 +345,7 @@ void *get_data(Iterator_t *it)
   }
 }
 
-Iterator_t *begin(Tree_t *tree)
+Iterator_t *begin(Set *tree)
 {
   Node_t *start = tree->root;
   if (!start) {
@@ -352,13 +357,13 @@ Iterator_t *begin(Tree_t *tree)
   return create_iterator(start, tree->root, tree->predicate);
 }
 
-Iterator_t *end(Tree_t *tree)
+Iterator_t *end(Set *tree)
 {
   Node_t *start = tree->root;
   if (!start) {
     return create_iterator(NULL, NULL, tree->predicate);
   }
-  while (start->right != NULL) {
+  while (start != NULL) {
     start = start->right;
   }
   return create_iterator(start, tree->root, tree->predicate);
@@ -385,7 +390,7 @@ static Iterator_t *find_tree(Node_t *node, void *data, int (*comparator)(), int 
   }
 }
 
-Iterator_t *find(Tree_t *tree, void *data, int (*comparator)())
+Iterator_t *find(Set *tree, void *data, int (*comparator)())
 {
   return find_tree(tree->root, data, comparator, tree->predicate);
 }
@@ -410,7 +415,7 @@ int has_next(Iterator_t *it)
 
 Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin) && comparator(get_data(begin), get_data(end)) != -1) {
+  while (has_next(begin) && begin->ptr != end->ptr) {
     if (comparator(get_data(begin), data) == 0 || comparator(get_data(begin), data) == -1) {
       return begin;
     }
@@ -421,7 +426,7 @@ Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*co
 
 Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin) && comparator(get_data(begin), get_data(end)) != -1) {
+  while (has_next(begin) && begin->ptr != end->ptr) {
     if (comparator(get_data(begin), data) == 0) {
       return begin;
     }
@@ -430,7 +435,7 @@ Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*co
   return begin;
 }
 
-void merge_tree(Tree_t *set1, Tree_t *set2, Node_t *node)
+void merge_tree(Set *set1, Set *set2, Node_t *node)
 {
   if (!node) {
     return;
@@ -439,7 +444,7 @@ void merge_tree(Tree_t *set1, Tree_t *set2, Node_t *node)
   insert(set1, node->data);
   merge_tree(set1, set2, node->right);
 }
-void merge(Tree_t *set1, Tree_t *set2)
+void merge(Set *set1, Set *set2)
 {
   merge_tree(set1, set2, set2->root);
 }

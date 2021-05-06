@@ -1,7 +1,8 @@
 #ifndef BST_H
 #  define BST_H
+
 typedef struct Node {
-  void *data; /* make this generic */
+  void *data;
   struct Node *left;
   struct Node *right;
   int ht;
@@ -11,7 +12,7 @@ typedef struct BST {
   Node_t *root;
   int (*predicate)();
   int size_of_type;
-} Tree_t;
+} Set;
 
 typedef struct Iterator {
   Node_t *ptr;
@@ -20,19 +21,19 @@ typedef struct Iterator {
 } Iterator_t;
 
 /* tree(set) interface */
-Tree_t *init_set(int (*predicate)(), int size_of_type); /* change this */
-void disp(Tree_t *tree, void (*printer)());
-void insert(Tree_t *tree, void *data);
-void erase(Tree_t *tree, void *data);
-void clear(Tree_t *tree);
-int size(Tree_t *tree);
-void merge(Tree_t *set1, Tree_t *set2);
+Set *init_set(int (*predicate)(), int size_of_type);
+void disp(Iterator_t *begin, Iterator_t *end, void (*printer)());
+void insert(Set *tree, void *data);
+void erase(Set *tree, void *data);
+void clear(Set *tree);
+int size(Set *tree);
+void merge(Set *set1, Set *set2);
 
 /* Iterator interface */
-void init_iterator(Iterator_t *iter, Tree_t *tree);
-Iterator_t *find(Tree_t *tree, void *data, int (*comparator)());
-Iterator_t *begin(Tree_t *tree);
-Iterator_t *end(Tree_t *tree);
+void init_iterator(Iterator_t *iter, Set *tree);
+Iterator_t *find(Set *tree, void *data, int (*comparator)());
+Iterator_t *begin(Set *tree);
+Iterator_t *end(Set *tree);
 Iterator_t *next(Iterator_t *iter);
 int has_next(Iterator_t *iter);
 Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)());
