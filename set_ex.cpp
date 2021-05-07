@@ -13,7 +13,7 @@ struct cmp {
 
 int main()
 {
-  set<int, cmp> s;
+  set<int, less<int>> s;
   s.insert(1);
   s.insert(3);
   s.insert(5);
@@ -24,7 +24,10 @@ int main()
     cout << i << endl;
   }
   set<int>::iterator lower, upper;
-  lower = lower_bound(s.begin(), s.end(), 5);
-  upper = upper_bound(s.begin(), s.end(), 5);
-  cout << *lower << " " << *upper << endl;
+  lower = end(s);
+  upper = begin(s);
+  for (auto i = lower; i != upper; --i) {
+    cout << *i << " ";
+  }
+  cout << endl;
 }

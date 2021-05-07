@@ -17,8 +17,11 @@
 /* void init_iterator(Iterator_t *iter, Set *tree); ---> initialises Iterator pointing to root*/
 /* Iterator_t *find(Set *tree, void *data, int (*comparator)()); ---> member find */
 /* Iterator_t *begin(Set *tree);----> returns Iterator to the beginning of the set */
-/* Iterator_t *end(Set *tree);---> returns Iterator to the end of the set */
-/* Iterator_t *next(Iterator_t *iter);----> returns Iterator to next element(inorder way) */
+/* Iterator_t *end(Set *tree);---> returns Iterator to location one past the last element */
+/* Iterator_t *rbegin(Set *tree);----> returns Iterator to the last element if the set */
+/* Iterator_t *rend(Set *tree);---> returns Iterator to location one previous than first element */
+/* void *next(Iterator_t *iter);----> moves the iterator to next element(inorder way) */
+/* void *next(Iterator_t *iter);----> moves the iterator to prev element(inorder way) */
 /* int has_next(Iterator_t *iter);----->checks whether Iterator is pointing to NULL */
 /* Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)()); */
 /* Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)()); */
@@ -109,89 +112,94 @@ int main()
   for (int i = 1; i < 6; i++) {
     insert(set0, &a[i]);
   }
-  disp(begin(set0), end(set0), printer_double);
-  double key = 3.5;
-  Iterator_t *it = find(set0, &key, comparator_double);
-  if (has_next(it)) {
-    printf("\nfound!! elem ");
-    printer_double(get_data(it));
-  }
-  else {
-    printf("Not found....\n");
-  }
-
-  key = 2.7;
-  Iterator_t *it1 = upper_bound(begin(set0), it, &key, comparator_double);
-  if (has_next(it1)) {
-    printf("\nupper bound found!! elem ");
-    printer_double(get_data(it1));
-  }
-  else {
-    printf("Not found....\n");
-  }
-
-  printf("Size : %d\n", size(set0));
-  erase(set0, &key);
-  disp(begin(set0), end(set0), printer_double);
-  printf("Size : %d\n", size(set0));
-  it = begin(set0);
+  Iterator_t *it = rbegin(set0);
   while (has_next(it)) {
-    printf("Next : ");
     printer_double(get_data(it));
-    next(it);
+    prev(it);
   }
+  /* disp(begin(set0), end(set0), printer_double); */
+  /* double key = 3.5; */
+  /* Iterator_t *it = find(set0, &key, comparator_double); */
+  /* if (has_next(it)) { */
+  /*   printf("\nfound!! elem "); */
+  /*   printer_double(get_data(it)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
 
-  Set *set1 = init_set(predicate_int, sizeof(int));
-  int b[6] = {2, 2, 5, 6, 11, 13};
-  for (int i = 0; i < 6; i++) {
-    insert(set1, &b[i]);
-  }
-  disp(begin(set1), end(set1), printer_int);
-  int key1 = 6;
-  it = find(set1, &key1, comparator_int);
-  if (has_next(it)) {
-    printf("\nfound!! elem ");
-    printer_int(get_data(it));
-  }
-  else {
-    printf("Not found....\n");
-  }
-  /* printf("Size : %d\n", size(set1)); */
-  /* erase(set1, &key); */
-  /* clear(set1); */
-  /* printf("Size : %d\n", size(set1)); */
-  /* it = begin(set1); */
+  /* key = 2.7; */
+  /* Iterator_t *it1 = upper_bound(begin(set0), it, &key, comparator_double); */
+  /* if (has_next(it1)) { */
+  /*   printf("\nupper bound found!! elem "); */
+  /*   printer_double(get_data(it1)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
+
+  /* printf("Size : %d\n", size(set0)); */
+  /* erase(set0, &key); */
+  /* disp(begin(set0), end(set0), printer_double); */
+  /* printf("Size : %d\n", size(set0)); */
+  /* it = begin(set0); */
   /* while (has_next(it)) { */
   /*   printf("Next : "); */
-  /*   printer_int(get_data(it)); */
+  /*   printer_double(get_data(it)); */
   /*   next(it); */
   /* } */
 
-  Set *set2 = init_set(my_predicate, sizeof(int));
-  int c[9] = {9, 3, 15, 13, 16, 19};
-  for (int i = 0; i < 9; i++) {
-    insert(set2, &c[i]);
-  }
-  disp(begin(set2), end(set2), printer_int);
-  int key2 = 6;
-  it = find(set2, &key1, comparator_int);
-  if (has_next(it)) {
-    printf("\nfound!! elem ");
-    printer_int(get_data(it));
-  }
-  else {
-    printf("Not found....\n");
-  }
+  /* Set *set1 = init_set(predicate_int, sizeof(int)); */
+  /* int b[6] = {2, 2, 5, 6, 11, 13}; */
+  /* for (int i = 0; i < 6; i++) { */
+  /*   insert(set1, &b[i]); */
+  /* } */
+  /* disp(begin(set1), end(set1), printer_int); */
+  /* int key1 = 6; */
+  /* it = find(set1, &key1, comparator_int); */
+  /* if (has_next(it)) { */
+  /*   printf("\nfound!! elem "); */
+  /*   printer_int(get_data(it)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
+  /* /\* printf("Size : %d\n", size(set1)); *\/ */
+  /* /\* erase(set1, &key); *\/ */
+  /* /\* clear(set1); *\/ */
+  /* /\* printf("Size : %d\n", size(set1)); *\/ */
+  /* /\* it = begin(set1); *\/ */
+  /* /\* while (has_next(it)) { *\/ */
+  /* /\*   printf("Next : "); *\/ */
+  /* /\*   printer_int(get_data(it)); *\/ */
+  /* /\*   next(it); *\/ */
+  /* /\* } *\/ */
 
-  int key3 = 3;
-  it = find(set2, &key1, comparator_int);
-  if (has_next(it)) {
-    printf("\nfound!! elem ");
-    printer_int(get_data(it));
-  }
-  else {
-    printf("Not found....\n");
-  }
+  /* Set *set2 = init_set(my_predicate, sizeof(int)); */
+  /* int c[9] = {9, 3, 15, 13, 16, 19}; */
+  /* for (int i = 0; i < 9; i++) { */
+  /*   insert(set2, &c[i]); */
+  /* } */
+  /* disp(begin(set2), end(set2), printer_int); */
+  /* int key2 = 6; */
+  /* it = find(set2, &key1, comparator_int); */
+  /* if (has_next(it)) { */
+  /*   printf("\nfound!! elem "); */
+  /*   printer_int(get_data(it)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
+
+  /* int key3 = 3; */
+  /* it = find(set2, &key1, comparator_int); */
+  /* if (has_next(it)) { */
+  /*   printf("\nfound!! elem "); */
+  /*   printer_int(get_data(it)); */
+  /* } */
+  /* else { */
+  /*   printf("Not found....\n"); */
+  /* } */
 
   /* printf("Size : %d\n", size(set2)); */
   /* erase(set2, &key); */

@@ -35,6 +35,26 @@ static Node_t *find_ancestor(Node_t *anc, Node_t *root, void *data, int (*predic
   }
 }
 
+static Node_t *find_ancestor_predecessor(Node_t *anc, Node_t *root, void *data, int (*predicate)())
+{
+  if (root == NULL) {
+    return NULL;
+  }
+  /* root->data <= data */
+  if (predicate(root->data, data) == 0 || predicate(root->data, data) == -1) {
+    if (anc && anc->right == root) {
+      return anc;
+    }
+    else {
+      return find_ancestor_predecessor(root, root->left, data, predicate);
+    }
+  }
+  /* data < root->data */
+  if (predicate(root->data, data) == 1) {
+    return find_ancestor_predecessor(root, root->right, data, predicate);
+  }
+}
+
 static Node_t *inorder_successor_par(Node_t *node, Node_t *root, int (*predicate)())
 {
   return find_ancestor(NULL, root, node->data, predicate);
@@ -46,6 +66,28 @@ static Node_t *inorder_successor(Node_t *node)
   temp = temp->right;
   while (temp->left) {
     temp = temp->left;
+  }
+  return temp;
+}
+
+static Node_t *inorder_predecessor_par(Node_t *node, Node_t *root, int (*predicate)())
+{
+  /* if (node == NULL) { */
+  /*   Node_t *temp = root; */
+  /*   while (temp->right) { */
+  /*     temp = temp->right; */
+  /*   } */
+  /*   return temp; */
+  /* } */
+  return find_ancestor_predecessor(NULL, root, node->data, predicate);
+}
+
+static Node_t *inorder_predecessor(Node_t *node)
+{
+  Node_t *temp = node;
+  temp = temp->left;
+  while (temp->right) {
+    temp = temp->right;
   }
   return temp;
 }
@@ -359,14 +401,24 @@ Iterator_t *begin(Set *tree)
 
 Iterator_t *end(Set *tree)
 {
+  return create_iterator(NULL, NULL, tree->predicate);
+}
+
+Iterator_t *rbegin(Set *tree)
+{
   Node_t *start = tree->root;
   if (!start) {
     return create_iterator(NULL, NULL, tree->predicate);
   }
-  while (start != NULL) {
+  while (start->right != NULL) {
     start = start->right;
   }
   return create_iterator(start, tree->root, tree->predicate);
+}
+
+Iterator_t *rend(Set *tree)
+{
+  return create_iterator(NULL, NULL, tree->predicate);
 }
 
 static Iterator_t *find_tree(Node_t *node, void *data, int (*comparator)(), int (*predicate)())
@@ -395,13 +447,23 @@ Iterator_t *find(Set *tree, void *data, int (*comparator)())
   return find_tree(tree->root, data, comparator, tree->predicate);
 }
 
-Iterator_t *next(Iterator_t *it)
+void next(Iterator_t *it)
 {
   if (it->ptr->right != NULL) {
     it->ptr = inorder_successor(it->ptr);
   }
   else {
     it->ptr = inorder_successor_par(it->ptr, it->root, it->predicate);
+  }
+}
+
+void prev(Iterator_t *it)
+{
+  if (it->ptr->left != NULL) {
+    it->ptr = inorder_predecessor(it->ptr);
+  }
+  else {
+    it->ptr = inorder_predecessor_par(it->ptr, it->root, it->predicate);
   }
 }
 
