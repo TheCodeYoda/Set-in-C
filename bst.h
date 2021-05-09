@@ -38,7 +38,7 @@ Iterator_t *rbegin(Set *tree);
 Iterator_t *rend(Set *tree);
 void next(Iterator_t *iter);
 void prev(Iterator_t *iter);
-int has_next(Iterator_t *iter);
+int is_not_null(Iterator_t *iter);
 Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)());
 Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)());
 void *get_data(Iterator_t *it);

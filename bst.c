@@ -339,7 +339,7 @@ static void inorder(Node_t *node, void (*printer)())
 void disp(Iterator_t *begin, Iterator_t *end, void (*printer)())
 {
   /* inorder(tree->root, printer); */
-  while (has_next(begin) && begin->ptr != end->ptr) {
+  while (is_not_null(begin) && begin->ptr != end->ptr) {
     printer(get_data(begin));
     next(begin);
   }
@@ -467,7 +467,7 @@ void prev(Iterator_t *it)
   }
 }
 
-int has_next(Iterator_t *it)
+int is_not_null(Iterator_t *it)
 {
   if (it->ptr == NULL) {
     return 0;
@@ -477,7 +477,7 @@ int has_next(Iterator_t *it)
 
 Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin) && begin->ptr != end->ptr) {
+  while (is_not_null(begin) && begin->ptr != end->ptr) {
     if (comparator(get_data(begin), data) == 0 || comparator(get_data(begin), data) == -1) {
       return begin;
     }
@@ -488,7 +488,7 @@ Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*co
 
 Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)())
 {
-  while (has_next(begin) && begin->ptr != end->ptr) {
+  while (is_not_null(begin) && begin->ptr != end->ptr) {
     if (comparator(get_data(begin), data) == 0) {
       return begin;
     }
