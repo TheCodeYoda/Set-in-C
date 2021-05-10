@@ -19,7 +19,7 @@
 /* Iterator_t *find(Set *tree, void *data, int (*comparator)()); ---> member find */
 /* Iterator_t *begin(Set *tree);----> returns Iterator to the beginning of the set */
 /* Iterator_t *end(Set *tree);---> returns Iterator to location one past the last element */
-/* Iterator_t *rbegin(Set *tree);----> returns Iterator to the last element if the set */
+/* Iterator_t *rbegin(Set *tree);----> returns Iterator to the last element of the set */
 /* Iterator_t *rend(Set *tree);---> returns Iterator to location one previous than first element */
 /* void *next(Iterator_t *iter);----> moves the iterator to next element(inorder way) */
 /* void *prev(Iterator_t *iter);----> moves the iterator to prev element(inorder way) */
@@ -140,7 +140,7 @@ void printer_string(const void *x)
 int main()
 {
 
-  /* -------float example : Def Predicate-- ------------------- */
+  /* -------float example : Def Predicate---------------------- */
   {
     Set *set0 = init_set(predicate_double, sizeof(double));
     double a[6] = {1.0, 1.5, 3.5, 2.7, 1.9, 7.9};
@@ -173,7 +173,7 @@ int main()
       printer_double(get_data(it2));
     }
     else {
-      printf("Not found....\n");
+      printf("%f not found....\n", key1);
     }
 
     printf("\n\n");
@@ -185,7 +185,7 @@ int main()
       printer_double(get_data(it2));
     }
     else {
-      printf("Not found....\n");
+      printf("%f not found....\n", key2);
     }
 
     printf("\n\n");
