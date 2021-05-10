@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "bst.h"
 
@@ -105,12 +106,45 @@ void printer_int(const void *x)
   printf("%d\n", *(int *)x);
 }
 
+int comparator_string(const void *x, const void *y)
+{
+  char *a = (char *)x;
+  char *b = (char *)y;
+  if (strcmp(a, b) < 0) {
+    return 1;
+  }
+  else if (strcmp(a, b) > 0) {
+    return 0;
+  }
+  return -1;
+}
+
+int predicate_string(const void *x, const void *y)
+{
+  char *a = (char *)x;
+  char *b = (char *)y;
+  if (strcmp(a, b) < 0) {
+    return 1;
+  }
+  else if (strcmp(a, b) > 0) {
+    return 0;
+  }
+  return -1;
+}
+
+void printer_string(const void *x)
+{
+  printf("%s\n", (char *)x);
+}
+
 int main()
 {
+
+  /* -------float example : Def Predicate-- ------------------- */
   {
     Set *set0 = init_set(predicate_double, sizeof(double));
     double a[6] = {1.0, 1.5, 3.5, 2.7, 1.9, 7.9};
-    for (int i = 1; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
       insert(set0, &a[i]);
     }
 
@@ -174,12 +208,12 @@ int main()
     /* inserting into set 1 */
     Set *set1 = init_set(predicate_double, sizeof(double));
     double b[6] = {1.0, 9.9, 3.5, 2, 7, 6.6};
-    for (int i = 1; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
       insert(set1, &b[i]);
     }
     /* inserting into set 0 after clearing in prev statements */
     double c[6] = {1.0, 1.5, 3.5, 2.7, 1.9, 7.9};
-    for (int i = 1; i < 6; i++) {
+    for (int i = 0; i < 6; i++) {
       insert(set0, &c[i]);
     }
     printf("\nBefore merging..\n\nSet 0 .... \n");
@@ -194,171 +228,274 @@ int main()
     printf("Set 1 .... \n");
     disp(begin(set1), end(set1), printer_double);
   }
-  /* disp(begin(set0), end(set0), printer_double); */
-  /* double key = 3.5; */
-  /* Iterator_t *it = find(set0, &key, comparator_double); */
-  /* if (is_not_null(it)) { */
-  /*   printf("\nfound!! elem "); */
-  /*   printer_double(get_data(it)); */
-  /* } */
-  /* else { */
-  /*   printf("Not found....\n"); */
-  /* } */
 
-  /* key = 2.7; */
-  /* Iterator_t *it1 = upper_bound(begin(set0), it, &key, comparator_double); */
-  /* if (is_not_null(it1)) { */
-  /*   printf("\nupper bound found!! elem "); */
-  /*   printer_double(get_data(it1)); */
-  /* } */
-  /* else { */
-  /*   printf("Not found....\n"); */
-  /* } */
+  /* ---------------------------Integer : Custom predicate ------------  */
 
-  /* printf("Size : %d\n", size(set0)); */
-  /* erase(set0, &key); */
-  /* disp(begin(set0), end(set0), printer_double); */
-  /* printf("Size : %d\n", size(set0)); */
-  /* it = begin(set0); */
-  /* while (is_not_null(it)) { */
-  /*   printf("Next : "); */
-  /*   printer_double(get_data(it)); */
-  /*   next(it); */
-  /* } */
+  /* { */
+  /*   Set *set0 = init_set(my_predicate, sizeof(int)); */
+  /*   int a[6] = {1, 7, 2, 3, 5, 4}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set0, &a[i]); */
+  /*   } */
 
-  /* Set *set1 = init_set(predicate_int, sizeof(int)); */
-  /* int b[6] = {2, 2, 5, 6, 11, 13}; */
-  /* for (int i = 0; i < 6; i++) { */
-  /*   insert(set1, &b[i]); */
-  /* } */
-  /* disp(begin(set1), end(set1), printer_int); */
-  /* int key1 = 6; */
-  /* it = find(set1, &key1, comparator_int); */
-  /* if (is_not_null(it)) { */
-  /*   printf("\nfound!! elem "); */
-  /*   printer_int(get_data(it)); */
-  /* } */
-  /* else { */
-  /*   printf("Not found....\n"); */
-  /* } */
-  /* /\* printf("Size : %d\n", size(set1)); *\/ */
-  /* /\* erase(set1, &key); *\/ */
-  /* /\* clear(set1); *\/ */
-  /* /\* printf("Size : %d\n", size(set1)); *\/ */
-  /* /\* it = begin(set1); *\/ */
-  /* /\* while (is_not_null(it)) { *\/ */
-  /* /\*   printf("Next : "); *\/ */
-  /* /\*   printer_int(get_data(it)); *\/ */
-  /* /\*   next(it); *\/ */
-  /* /\* } *\/ */
+  /*   printf("Reverse Iterating:\n"); */
+  /*   Iterator_t *it = rbegin(set0); */
+  /*   while (is_not_null(it)) { */
+  /*     printer_int(get_data(it)); */
+  /*     prev(it); */
+  /*   } */
 
-  /* Set *set2 = init_set(my_predicate, sizeof(int)); */
-  /* int c[9] = {9, 3, 15, 13, 16, 19}; */
-  /* for (int i = 0; i < 9; i++) { */
-  /*   insert(set2, &c[i]); */
-  /* } */
-  /* disp(begin(set2), end(set2), printer_int); */
-  /* int key2 = 6; */
-  /* it = find(set2, &key1, comparator_int); */
-  /* if (is_not_null(it)) { */
-  /*   printf("\nfound!! elem "); */
-  /*   printer_int(get_data(it)); */
-  /* } */
-  /* else { */
-  /*   printf("Not found....\n"); */
-  /* } */
+  /*   printf("\n\n"); */
 
-  /* int key3 = 3; */
-  /* it = find(set2, &key1, comparator_int); */
-  /* if (is_not_null(it)) { */
-  /*   printf("\nfound!! elem "); */
-  /*   printer_int(get_data(it)); */
-  /* } */
-  /* else { */
-  /*   printf("Not found....\n"); */
-  /* } */
+  /*   printf("Forward Iterating:\n"); */
+  /*   Iterator_t *it1 = begin(set0); */
+  /*   while (is_not_null(it1)) { */
+  /*     printer_int(get_data(it1)); */
+  /*     next(it1); */
+  /*   } */
 
-  /* printf("Size : %d\n", size(set2)); */
-  /* erase(set2, &key); */
-  /* clear(set2); */
-  /* printf("Size : %d\n", size(set2)); */
-  /* it = begin(set2); */
-  /* while (is_not_null(it)) { */
-  /*   printf("Next : "); */
-  /*   printer_int(get_data(it)); */
-  /*   next(it); */
+  /*   printf("\n\n"); */
+
+  /*   int key1 = 3; */
+  /*   Iterator_t *it2 = find(set0, &key1, comparator_int); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_int(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
+
+  /*   printf("\n\n"); */
+
+  /*   int key2 = 11; */
+  /*   it2 = find(set0, &key2, comparator_int); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_int(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
+
+  /*   printf("\n\n"); */
+
+  /*   int key3 = 3; */
+  /*   printf("erasing element %d....\n", key3); */
+  /*   erase(set0, &key3); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("clearing set...\n"); */
+  /*   clear(set0); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("size %d\n", size(set0)); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("Merge operation...\n"); */
+  /*   /\* inserting into set 1 *\/ */
+  /*   Set *set1 = init_set(my_predicate, sizeof(int)); */
+  /*   int b[6] = {1, 7, 11, 3, 2, 6}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set1, &b[i]); */
+  /*   } */
+  /*   /\* inserting into set 0 after clearing in prev statements *\/ */
+  /*   int c[6] = {12, 15, 23, 11, 7, 3}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set0, &c[i]); */
+  /*   } */
+  /*   printf("\nBefore merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_int); */
+  /*   merge(set0, set1); */
+  /*   printf("\n\nAfter merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_int); */
   /* } */
 
-  /* printf("before merge: \n\n"); */
-  /* disp(set1, printer_int); */
-  /* printf("\n"); */
-  /* disp(set2, printer_int); */
-  /* printf("\n\nafter merge:\n\n"); */
-  /* merge(set2, set1); */
-  /* disp(set1, printer_int); */
-  /* printf("\n"); */
-  /* disp(set2, printer_int); */
+  /* ------------Integer : def. predicate ----------------  */
 
-  /* Iterator_t *it1 = upper_bound(begin(set0), end(set0), 5); */
-  /* printf("\nUpper bound of 5 : %d\n", get_data(it1)); */
-  /* Iterator_t *it2 = lower_bound(begin(set0), end(set0), 5); */
-  /* printf("\nLower bound of 5 : %d\n", get_data(it2)); */
+  /* { */
+  /*   Set *set0 = init_set(predicate_int, sizeof(int)); */
+  /*   int a[6] = {1, 7, 2, 3, 5, 4}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set0, &a[i]); */
+  /*   } */
 
-  /* erase(set0, 2); */
-  /* erase(set0, 4); */
-  /* erase(set0, 7); */
+  /*   printf("Reverse Iterating:\n"); */
+  /*   Iterator_t *it = rbegin(set0); */
+  /*   while (is_not_null(it)) { */
+  /*     printer_int(get_data(it)); */
+  /*     prev(it); */
+  /*   } */
 
-  /* printf("Size : %d\n", size(set0)); */
+  /*   printf("\n\n"); */
 
-  /* insert(set0, 2); */
-  /* insert(set0, 2); */
-  /* insert(set0, 4); */
+  /*   printf("Forward Iterating:\n"); */
+  /*   Iterator_t *it1 = begin(set0); */
+  /*   while (is_not_null(it1)) { */
+  /*     printer_int(get_data(it1)); */
+  /*     next(it1); */
+  /*   } */
 
-  /* printf("Size : %d\n", size(set0)); */
+  /*   printf("\n\n"); */
 
-  /* disp(set0); */
+  /*   int key1 = 3; */
+  /*   Iterator_t *it2 = find(set0, &key1, comparator_int); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_int(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
 
-  /* Iterator_t *it_start; */
-  /* it_start = begin(set0); */
-  /* printf("iter_start : %d\n", get_data(it_start)); */
+  /*   printf("\n\n"); */
 
-  /* Iterator_t *it_end; */
-  /* it_end = end(set0); */
-  /* printf("iter_start : %d\n", get_data(it_end)); */
+  /*   int key2 = 11; */
+  /*   it2 = find(set0, &key2, comparator_int); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_int(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
 
-  /* Iterator_t *res = find(set0, 7); */
-  /* if (res->ptr == NULL) { */
-  /*   printf("\n not found!!\n"); */
+  /*   printf("\n\n"); */
+
+  /*   int key3 = 3; */
+  /*   printf("erasing element %d....\n", key3); */
+  /*   erase(set0, &key3); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("clearing set...\n"); */
+  /*   clear(set0); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("size %d\n", size(set0)); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("Merge operation...\n"); */
+  /*   /\* inserting into set 1 *\/ */
+  /*   Set *set1 = init_set(predicate_int, sizeof(int)); */
+  /*   int b[6] = {1, 7, 11, 3, 2, 6}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set1, &b[i]); */
+  /*   } */
+  /*   /\* inserting into set 0 after clearing in prev statements *\/ */
+  /*   int c[6] = {12, 15, 23, 11, 7, 3}; */
+  /*   for (int i = 0; i < 6; i++) { */
+  /*     insert(set0, &c[i]); */
+  /*   } */
+  /*   printf("\nBefore merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_int); */
+  /*   merge(set0, set1); */
+  /*   printf("\n\nAfter merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_int); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_int); */
   /* } */
-  /* else { */
-  /*   printf("res : %d\n", get_data(res)); */
-  /* } */
 
-  /* printf("Clearing set...\n"); */
-  /* clear(set0); */
-  /* insert(set0, 7); */
-  /* disp(set0); */
+  /*----------- String  : def.predicate ----------- */
 
-  /* Set *set1 = init_set(my_predicate, "int"); */
-  /* insert(set1, 3); */
-  /* insert(set1, 5); */
-  /* insert(set1, 9); */
-  /* insert(set1, 12); */
-  /* insert(set1, 13); */
-  /* insert(set1, 15); */
-  /* disp(set1); */
+  /* { */
+  /*   char a[][100] = {"Jack", "John", "codeyoda", "aditya", "shashank"}; */
+  /*   Set *set0 = init_set(predicate_string, 100); */
+  /*   for (char i = 0; i < 5; i++) { */
+  /*     insert(set0, a[i]); */
+  /*   } */
 
-  /* it = begin(set1); */
-  /* while (is_not_null(it)) { */
-  /*   printf("Next : %d\n", get_data(it)); */
-  /*   next(it); */
-  /* } */
+  /*   printf("Reverse Iterating:\n"); */
+  /*   Iterator_t *it = rbegin(set0); */
+  /*   while (is_not_null(it)) { */
+  /*     printer_string(get_data(it)); */
+  /*     prev(it); */
+  /*   } */
 
-  /* Iterator_t *res = find(set1, 7); */
-  /* if (res->ptr == NULL) { */
-  /*   printf("\n not found!!\n"); */
-  /* } */
-  /* else { */
-  /*   printf("res : %d\n", get_data(res)); */
+  /*   printf("\n\n"); */
+
+  /*   printf("Forward Iterating:\n"); */
+  /*   Iterator_t *it1 = begin(set0); */
+  /*   while (is_not_null(it1)) { */
+  /*     printer_string(get_data(it1)); */
+  /*     next(it1); */
+  /*   } */
+
+  /*   printf("\n\n"); */
+
+  /*   char key1[5] = "Jack"; */
+  /*   Iterator_t *it2 = find(set0, &key1, comparator_string); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_string(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
+
+  /*   printf("\n\n"); */
+
+  /*   char key2[4] = "asd"; */
+  /*   it2 = find(set0, &key2, comparator_string); */
+  /*   if (is_not_null(it2)) { */
+  /*     printf("found!! elem..."); */
+  /*     printer_string(get_data(it2)); */
+  /*   } */
+  /*   else { */
+  /*     printf("Not found....\n"); */
+  /*   } */
+
+  /*   printf("\n\n"); */
+
+  /*   char key3[5] = "Jack"; */
+  /*   printf("erasing element %s....\n", key3); */
+  /*   erase(set0, key3); */
+  /*   disp(begin(set0), end(set0), printer_string); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("clearing set...\n"); */
+  /*   clear(set0); */
+  /*   disp(begin(set0), end(set0), printer_string); */
+  /*   printf("size %d\n", size(set0)); */
+
+  /*   printf("\n\n"); */
+
+  /*   printf("Merge operation...\n"); */
+  /*   /\* inserting into set 1 *\/ */
+  /*   Set *set1 = init_set(predicate_string, 100); */
+  /*   char b[][100] = {"HP", "Apple", "Dell", "Asus", "Samsung"}; */
+  /*   for (char i = 0; i < 5; i++) { */
+  /*     insert(set1, b[i]); */
+  /*   } */
+  /*   /\* inserting into set 0 after clearing in prev statements *\/ */
+  /*   char c[][100] = {"alienware", "HP", "Benq"}; */
+  /*   for (char i = 0; i < 3; i++) { */
+  /*     insert(set0, c[i]); */
+  /*   } */
+  /*   printf("\nBefore merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_string); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_string); */
+  /*   merge(set0, set1); */
+  /*   printf("\n\nAfter merging..\n\nSet 0 .... \n"); */
+  /*   disp(begin(set0), end(set0), printer_string); */
+  /*   printf("\n"); */
+  /*   printf("Set 1 .... \n"); */
+  /*   disp(begin(set1), end(set1), printer_string); */
   /* } */
 }

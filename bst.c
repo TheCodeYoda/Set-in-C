@@ -15,49 +15,44 @@ static int max(int a, int b)
   return (a > b) ? a : b;
 }
 
-static Node_t *find_ancestor(Node_t *anc, Node_t *root, void *data, int (*predicate)())
+static Node_t *find_ancestor(Node_t *root, void *data, int (*predicate)())
 {
-  if (root == NULL) {
-    return NULL;
-  }
-  /* root->data <= data */
-  if (predicate(root->data, data) == 1 || predicate(root->data, data) == -1) {
-    if (anc && anc->left == root) {
-      return anc;
+  Node_t *par = NULL;
+  while (root != NULL) {
+    if (predicate(data, root->data) == 1) {
+      par = root;
+      root = root->left;
     }
-    else {
-      return find_ancestor(root, root->right, data, predicate);
-    }
+    else if (predicate(data, root->data) == 0)
+      root = root->right;
+    else
+      break;
   }
-  /* data < root->data */
-  if (predicate(data, root->data)) {
-    return find_ancestor(root, root->left, data, predicate);
-  }
+
+  return par;
 }
 
-static Node_t *find_ancestor_predecessor(Node_t *anc, Node_t *root, void *data, int (*predicate)())
+static Node_t *find_ancestor_predecessor(Node_t *root, void *data, int (*predicate)())
 {
-  if (root == NULL) {
-    return NULL;
-  }
-  /* root->data <= data */
-  if (predicate(root->data, data) == 0 || predicate(root->data, data) == -1) {
-    if (anc && anc->right == root) {
-      return anc;
+  Node_t *par = NULL;
+  while (root != NULL) {
+    if (predicate(data, root->data) == 1) {
+      root = root->left;
     }
-    else {
-      return find_ancestor_predecessor(root, root->left, data, predicate);
+    else if (predicate(data, root->data) == 0) {
+      par = root;
+      root = root->right;
     }
+    else
+      break;
   }
-  /* data < root->data */
-  if (predicate(root->data, data) == 1) {
-    return find_ancestor_predecessor(root, root->right, data, predicate);
-  }
+
+  return par;
 }
 
 static Node_t *inorder_successor_par(Node_t *node, Node_t *root, int (*predicate)())
 {
-  return find_ancestor(NULL, root, node->data, predicate);
+  return find_ancestor(root, node->data, predicate);
 }
 
 static Node_t *inorder_successor(Node_t *node)
@@ -79,7 +74,7 @@ static Node_t *inorder_predecessor_par(Node_t *node, Node_t *root, int (*predica
   /*   } */
   /*   return temp; */
   /* } */
-  return find_ancestor_predecessor(NULL, root, node->data, predicate);
+  return find_ancestor_predecessor(root, node->data, predicate);
 }
 
 static Node_t *inorder_predecessor(Node_t *node)
@@ -167,6 +162,7 @@ static Node_t *leftRotate(Node_t *x)
 
 static Node_t *insert_tree(Node_t *root, void *data, int (*predicate)(), int size_of_type)
 {
+
   if (root == NULL) {
     return create_node(data, size_of_type);
   }
@@ -332,13 +328,14 @@ static void inorder(Node_t *node, void (*printer)())
   if (node == NULL)
     return;
   inorder(node->left, printer);
-  printer(node->data);
+  /* printer(node->data); */
+  printf("%d %d %d\n", *(int *)node->data, node->ht, get_balance_factor(node));
   inorder(node->right, printer);
 }
 
 void disp(Iterator_t *begin, Iterator_t *end, void (*printer)())
 {
-  /* inorder(tree->root, printer); */
+  /* inorder(begin->root, printer); */
   while (is_not_null(begin) && begin->ptr != end->ptr) {
     printer(get_data(begin));
     next(begin);
