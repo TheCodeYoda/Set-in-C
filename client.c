@@ -5,24 +5,23 @@
 
 /* SET INTERFACE : */
 
-/* Set *init_set(int (*predicate)(), int size_of_type); ----------> Initialises the set*/
+/* Set *init_set(int (*predicate)(), int size_of_type); ----------> Initialises the set */
 /* void disp(Set *tree, void (*printer)());------------------------> displays the set */
 /* void insert(Set *tree, void *data);--------------------------> Inserts data into set */
-/* void erase(Set *tree, void *data);--------------> erases single element in the set*/
+/* void erase(Set *tree, void *data);--------------> erases single element in the set */
 /* void clear(Set *tree); ---------------------------------> clears the entire set */
 /* int size(Set *tree); ------------------------------> no. of elements in the set */
 /* void merge(Set *set1, Set *set2); ------> merges 2 sets based o first set's predicate */
 
 /* ITERATOR INTERFACE: */
 
-/* void init_iterator(Iterator_t *iter, Set *tree); ---> initialises Iterator pointing to root*/
 /* Iterator_t *find(Set *tree, void *data, int (*comparator)()); ---> member find */
 /* Iterator_t *begin(Set *tree);----> returns Iterator to the beginning of the set */
 /* Iterator_t *end(Set *tree);---> returns Iterator to location one past the last element */
 /* Iterator_t *rbegin(Set *tree);----> returns Iterator to the last element if the set */
 /* Iterator_t *rend(Set *tree);---> returns Iterator to location one previous than first element */
 /* void *next(Iterator_t *iter);----> moves the iterator to next element(inorder way) */
-/* void *next(Iterator_t *iter);----> moves the iterator to prev element(inorder way) */
+/* void *prev(Iterator_t *iter);----> moves the iterator to prev element(inorder way) */
 /* int is_not_null(Iterator_t *iter);----->checks whether Iterator is pointing to NULL */
 /* Iterator_t *lower_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)()); */
 /* Iterator_t *upper_bound(Iterator_t *begin, Iterator_t *end, void *data, int (*comparator)()); */
