@@ -6,7 +6,8 @@
 /* SET INTERFACE : */
 
 /* Set *init_set(int (*predicate)(), int size_of_type); ----------> Initialises the set */
-/* void disp(Set *tree, void (*printer)());------------------------> displays the set */
+/* void disp(Iterator* begin, Iterator* end, void (*printer)());------------------------> displays
+ * the set */
 /* void insert(Set *tree, void *data);--------------------------> Inserts data into set */
 /* void erase(Set *tree, void *data);--------------> erases single element in the set */
 /* void clear(Set *tree); ---------------------------------> clears the entire set */
